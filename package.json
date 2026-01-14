@@ -1,0 +1,19 @@
+{
+  "name": "lanerp",
+  "version": "1.0.0",
+  "description": "我的第一个npm包",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/index.test.js"
+  },
+  "keywords": [
+    "lanerp",
+    "utils"
+  ],
+  "author": "zhanghuai",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zhanghuai123/lanerp.git"
+  }
+}
