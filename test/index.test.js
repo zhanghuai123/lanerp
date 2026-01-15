@@ -2,6 +2,6 @@
  * 测试文件示例
  */
 
-const {getNowDate} = require('../index');
+const {isMobile} = require('../index');
 
-console.log(getNowDate('datetime'),7);
+console.log(isMobile(),7);
