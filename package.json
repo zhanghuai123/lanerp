@@ -1,7 +1,7 @@
 {
   "name": "lanerp",
-  "version": "1.0.0",
-  "description": "我的第一个npm包",
+  "version": "1.0.1",
+  "description": "一个npm包",
   "main": "index.js",
   "scripts": {
     "test": "node test/index.test.js"
