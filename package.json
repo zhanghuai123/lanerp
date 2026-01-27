@@ -1,7 +1,7 @@
 {
   "name": "lanerp",
-  "version": "1.0.3",
-  "description": "一个npm包",
+  "version": "1.0.4",
+  "description": "A collection of utility functions for lanerp projects",
   "main": "index.js",
   "scripts": {
     "test": "node test/index.test.js"

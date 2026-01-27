@@ -5,7 +5,16 @@ const isMobile = () => {
     );
     return flag;
 }
+/**
+ * 判断是否是微信浏览器
+ * @returns {boolean} 是否是微信浏览器
+ */
+const isWeixin = () => {
+    const ua = window.navigator.userAgent.toLowerCase();
+    return ua.indexOf('micromessenger') > -1;
+};
 
 module.exports = {
-    isMobile
+    isMobile,
+    isWeixin
 }
