@@ -53,7 +53,149 @@ const formatThousandsPrice = (num,unit='') => {
     }
     return num||num===0?unit+formatThousands(num):'--'
 }
+/**
+ * 将数字金额转换为大写中文金额
+ * @param {number|string} money - 金额数字
+ * @param {boolean} [has_unit=false] - 是否包含"元"单位
+ * @returns {string} 中文大写金额
+ */
+const numberPriceToChinese = (money, has_unit) => {
+    //汉字的数字
+    const cnNums = ['零', '壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖']
+    //基本单位
+    const cnIntRadice = ['', '拾', '佰', '仟']
+    //对应整数部分扩展单位
+    const cnIntUnits = ['', '万', '亿', '兆']
+    //对应小数部分单位
+    const cnDecUnits = ['角', '分', '毫', '厘']
+    //整数金额时后面跟的字符
+    const cnInteger = '整'
+    //整型完以后的单位
+    const cnIntLast = has_unit ? '元' : ''
+    //最大处理的数字
+    const maxNum = 999999999999999.9999
+    //金额整数部分
+    let integerNum
+    //金额小数部分
+    let decimalNum
+    //输出的中文金额字符串
+    let chineseStr = ''
+    //分离金额后用的数组，预定义
+    let parts
+    if (money === '') {
+        return ''
+    }
+    money = parseFloat(money);
+    if (money >= maxNum) {
+        //超出最大处理数字
+        return ''
+    }
+    if (money < 0) {
+        chineseStr += '负'
+        money = Math.abs(money)
+    }
+    if (money === 0) {
+        chineseStr = cnNums[0] + cnIntLast + cnInteger
+        return chineseStr
+    }
+    //转换为字符串
+    money = money.toString()
+    if (money.indexOf('.') === -1) {
+        integerNum = money
+        decimalNum = ''
+    } else {
+        parts = money.split('.')
+        integerNum = parts[0]
+        decimalNum = parts[1].substr(0, 4)
+    }
+    //获取整型部分转换
+    if (parseInt(integerNum, 10) > 0) {
+        let zeroCount = 0
+        const IntLen = integerNum.length
+        for (let i = 0; i < IntLen; i++) {
+            let n = integerNum.substr(i, 1)
+            let p = IntLen - i - 1
+            let q = p / 4
+            let m = p % 4
+            if (n === '0') {
+                zeroCount++
+            } else {
+                if (zeroCount > 0) {
+                    chineseStr += cnNums[0]
+                }
+                //归零
+                zeroCount = 0
+                chineseStr += cnNums[parseInt(n)] + cnIntRadice[m]
+            }
+            if (m === 0 && zeroCount < 4) {
+                chineseStr += cnIntUnits[q]
+            }
+        }
+        chineseStr += cnIntLast
+    }
+    //小数部分
+    if (decimalNum !== '') {
+        var decLen = decimalNum.length
+        for (let i = 0; i < decLen; i++) {
+            let n = decimalNum.substr(i, 1)
+            if (n !== '0') {
+                chineseStr += cnNums[Number(n)] + cnDecUnits[i]
+            }
+        }
+    }
+    if (chineseStr === '') {
+        chineseStr += cnNums[0] + cnIntLast + cnInteger
+    } else if (decimalNum === '') {
+        chineseStr += cnInteger
+    }
+    return chineseStr
+}
+
+/**
+ * 商品单价优惠情况文字
+ * @param {Object} goods - 商品对象
+ * @param {number} goods.guide_price - 指导价
+ * @param {Object} goods.price - 价格对象
+ * @param {number} goods.price.value - 实际价格
+ * @param {number} goods.num - 数量
+ * @returns {Object} { class: string, text: string }
+ */
+const goodsPriceDiscountsText = (goods) => {
+    const { guide_price = 0, price } = goods
+    if (Number(price.value) === 0) {
+        return {
+            class: 'gift',
+            text: '赠送'
+        }
+    } else if (Number(price.value) > Number(guide_price)) {
+        const total = (Number(price.value) - Number(guide_price)) * goods.num
+        return {
+            class: 'premium',
+            text: '溢价' + formatThousands(formatToFixed(total))
+        }
+    } else {
+        const total = (Number(guide_price) - Number(price.value)) * goods.num
+        return {
+            class: 'discount',
+            text: '优惠' + formatThousands(formatToFixed(total))
+        }
+    }
+}
+
+// 内部辅助函数
+const formatToFixed = (value, decimalPlaces = 2) => {
+    const num = parseFloat(value);
+    if (isNaN(num)) return `0.${'0'.repeat(decimalPlaces)}`;
+    return num.toLocaleString('fullwide', {
+        useGrouping: false,
+        minimumFractionDigits: decimalPlaces,
+        maximumFractionDigits: decimalPlaces
+    });
+}
+
 module.exports = {
     formatThousands,
-    formatThousandsPrice
+    formatThousandsPrice,
+    numberPriceToChinese,
+    goodsPriceDiscountsText
 }
